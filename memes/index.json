@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "memes": [
+    {
+      "file": "nope-alastor.mp4",
+      "original": "EwzdnYSs.mp4",
+      "tone": "normal",
+      "aliases": ["nope alastor", "alastor nope", "nope"],
+      "description": "alastor from hazbin hotel saying nope, refusing, declining, absolutely not, no thanks, hard pass, rejecting an idea, backing out, walking away from a bad plan, radio demon, not doing that, count me out"
+    },
+    {
+      "file": "jessica-rabbit-sensual.webp",
+      "original": "1000014475.webp",
+      "tone": "normal",
+      "aliases": ["jessica rabbit", "sensual"],
+      "description": "jessica rabbit singing into a microphone, red hair, sultry seductive look, flirty, sensual, smooth, charming, teasing, being suggestive, femme fatale, alluring, turning on the charm"
+    },
+    {
+      "file": "tweaking-out.webp",
+      "original": "1000014435.webp",
+      "tone": "normal",
+      "aliases": ["tweaking", "im tweaking"],
+      "description": "distorted melting simpsons face in a bathroom mirror, tweaking out, freaking out, losing my mind, going insane, panicking, mental breakdown, overwhelmed, unhinged, losing it, spiralling, stressed beyond words, horrified"
+    },
+    {
+      "file": "zee-new-art.jpg",
+      "original": "1000014399.jpg",
+      "tone": "normal",
+      "aliases": ["zee art", "new art"],
+      "description": "me when zee posts a new art, overflowing bin of tissues on the floor, reacting to someone posting new artwork, way too excited about an artist posting, obsessed with an artist, going feral over new art, fan reaction"
+    },
+    {
+      "file": "fuck-ai.jpg",
+      "original": "1000014397.jpg",
+      "tone": "normal",
+      "aliases": ["fuck ai", "anti ai"],
+      "description": "fuck ai twice, no ai crossed out sign next to glados from portal, hating ai, anti ai, against generative ai, ai slop, ironic because glados is also an ai, machine learning hate, chatgpt hate, robots"
+    },
+    {
+      "file": "gore-fans-when.jpg",
+      "original": "1000014624.jpg",
+      "tone": "dark",
+      "aliases": ["gore fans", "gore fetishists"],
+      "description": "gore fetishists when you open their ribcages and pull out their organs, they suddenly do not like blood and pain anymore, crying screaming baby boss baby, people who say they love something until it happens to them, cannot take what they dish out, hypocrite, squeamish, be careful what you wish for"
+    },
+    {
+      "file": "my-name-is-romeo.jpg",
+      "original": "1000014235.jpg",
+      "tone": "normal",
+      "aliases": ["romeo", "rose emoji"],
+      "description": "yellow smiley emoji holding a red rose in its teeth, smug flirty grin, my name is romeo, flirting, rizz, being smooth, charming, romantic, seducing, pick up line, suave, wink"
+    },
+    {
+      "file": "zuckerberg-good-boy.png",
+      "original": "1000014063.png",
+      "tone": "normal",
+      "aliases": ["zuckerberg", "good boy"],
+      "description": "mark zuckerberg looking up at the camera with his tongue out like an eager dog, good boy, obedient, waiting for praise, silly, goofy, lizard robot person, please pet me, doing what he is told"
+    },
+    {
+      "file": "fuck-you-mean-no.png",
+      "original": "1000013979.png",
+      "tone": "normal",
+      "aliases": ["fuck you mean no", "what do you mean no"],
+      "description": "angry confused yellow emoji face, fuck you mean no, what do you mean no, refusing to accept a refusal, disbelief at being told no, offended by rejection, that was not an option, excuse me"
+    },
+    {
+      "file": "isaacs-dancing.png",
+      "original": "1000013921.png",
+      "tone": "normal",
+      "aliases": ["isaac", "isaacs dancing"],
+      "description": "binding of isaac sprite crying, the isaacs dancing, little pixel character, vibing, dancing, celebrating, sad but moving, roguelike game, tiny crying baby sprite"
+    }
+  ]
+}

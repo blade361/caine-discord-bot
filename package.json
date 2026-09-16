@@ -1,0 +1,17 @@
+{
+  "name": "meme-bot",
+  "version": "1.0.0",
+  "description": "Discord bot that finds memes by description, using a fly-brain similarity hash",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node src/index.js",
+    "deploy": "node src/deploy-commands.js",
+    "check": "node src/check-index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.5"
+  },
+  "engines": { "node": ">=18" }
+}

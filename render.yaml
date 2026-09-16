@@ -1,0 +1,51 @@
+# Two ways to run this. Uncomment ONE.
+#
+# A) Background Worker — the correct product for a bot. Always on, no
+#    keep-alive tricks. Paid (~$7/month at the time of writing).
+#
+# B) Web Service on the free tier — sleeps after 15 minutes of no HTTP
+#    traffic, which for a bot means it sleeps always. The health endpoint
+#    traffic, which for a bot means it sleeps always. The bot pings its own
+#    public URL every 10 minutes to prevent that, so no external service is
+#    needed. It cannot wake itself once down, though, so expect the odd gap
+#    after a crash or a redeploy.
+
+services:
+  # ---- A) Background Worker ----
+  # - type: worker
+  #   name: meme-bot
+  #   runtime: node
+  #   plan: starter
+  #   buildCommand: npm install
+  #   startCommand: npm start
+  #   envVars:
+  #     - key: DISCORD_TOKEN
+  #       sync: false
+  #     - key: CLIENT_ID
+  #       sync: false
+  #     - key: GUILD_ID
+  #       sync: false
+  #     - key: MIN_SCORE
+  #       value: "0.45"
+
+  # ---- B) Free Web Service + keep-alive ----
+  - type: web
+    name: meme-bot
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: DISCORD_TOKEN
+        sync: false      # set it in the Render dashboard, never in this file
+      - key: CLIENT_ID
+        sync: false
+      - key: GUILD_ID
+        sync: false
+      - key: MIN_SCORE
+        value: "0.45"
+      # How often the bot pings itself to stay awake. Must stay under
+      # Render's 15-minute idle timeout.
+      - key: KEEPALIVE_MINUTES
+        value: "10"
