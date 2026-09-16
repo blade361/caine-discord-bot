@@ -137,6 +137,18 @@ npm run deploy
 
 It only writes to Discord's API, so it does not need to run on the server.
 
+Commands are registered per server, not globally — they appear instantly that
+way instead of taking up to an hour. So a server that has the bot but was
+never in `GUILD_ID` will show no `/meme` at all. For several servers, list the
+ids separated by commas:
+
+```
+GUILD_ID=111111111111111111,222222222222222222
+```
+
+and run `npm run deploy` again. Existing registrations are not removed, so
+adding a server later is safe.
+
 ### Which Render service
 
 A Discord bot holds an outbound websocket and receives no HTTP traffic, so
