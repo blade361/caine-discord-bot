@@ -10,6 +10,7 @@
 
 import 'dotenv/config';
 import path from 'node:path';
+import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import {
   Client,
@@ -59,8 +60,15 @@ client.on('interactionCreate', async (interaction) => {
       await handleButton(interaction);
     }
   } catch (err) {
+    // Show the actual reason. A generic "something went wrong" is useless to
+    // whoever has to fix it, and these failures are almost always one of two
+    // boring things: a missing channel permission or a missing file.
     console.error('[memebot] interaction failed:', err);
-    const msg = { content: 'Something went wrong on my end.', flags: MessageFlags.Ephemeral };
+    const detail = err.code ? `\`${err.code}\` ${err.message}` : `\`${err.message}\``;
+    const msg = {
+      content: `That didn't work: ${detail}`,
+      flags: MessageFlags.Ephemeral,
+    };
     if (interaction.deferred || interaction.replied) await interaction.followUp(msg).catch(() => {});
     else await interaction.reply(msg).catch(() => {});
   }
@@ -141,9 +149,30 @@ async function handleButton(interaction) {
 
   // Attach from disk rather than linking. No hosting, no broken embeds, and
   // it works the same for images, gifs and video.
-  const attachment = new AttachmentBuilder(library.filePath(meme));
+  const filePath = library.filePath(meme);
 
-  await interaction.channel.send({ files: [attachment] });
+  if (!existsSync(filePath)) {
+    console.error(`[memebot] file missing on disk: ${filePath}`);
+    await interaction.update({
+      content: `\`${meme.file}\` is in the index but not on disk. Run \`npm run check\`.`,
+      components: [],
+    });
+    return;
+  }
+
+  // Two routes to the channel, because they fail in different ways.
+  // channel.send needs Send Messages and Attach Files in that specific
+  // channel, and interaction.channel is null if the bot cannot even view it.
+  // The interaction webhook (followUp) does not go through those checks, so
+  // it works in channels where the direct send is refused.
+  try {
+    if (!interaction.channel) throw new Error('channel not available');
+    await interaction.channel.send({ files: [new AttachmentBuilder(filePath, { name: meme.file })] });
+  } catch (err) {
+    console.warn(`[memebot] direct send failed (${err.code ?? err.message}), using webhook`);
+    await interaction.followUp({ files: [new AttachmentBuilder(filePath, { name: meme.file })] });
+  }
+
   pending.delete(sourceId);
   await interaction.update({ content: 'Posted.', components: [] });
 }
