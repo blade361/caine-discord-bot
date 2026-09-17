@@ -5,71 +5,224 @@
       "file": "nope-alastor.mp4",
       "original": "EwzdnYSs.mp4",
       "tone": "normal",
-      "aliases": ["nope alastor", "alastor nope", "nope"],
+      "aliases": [
+        "nope alastor",
+        "alastor nope",
+        "nope"
+      ],
       "description": "alastor from hazbin hotel saying nope, refusing, declining, absolutely not, no thanks, hard pass, rejecting an idea, backing out, walking away from a bad plan, radio demon, not doing that, count me out"
     },
     {
       "file": "jessica-rabbit-sensual.webp",
       "original": "1000014475.webp",
       "tone": "normal",
-      "aliases": ["jessica rabbit", "sensual"],
+      "aliases": [
+        "jessica rabbit",
+        "sensual"
+      ],
       "description": "jessica rabbit singing into a microphone, red hair, sultry seductive look, flirty, sensual, smooth, charming, teasing, being suggestive, femme fatale, alluring, turning on the charm"
     },
     {
       "file": "tweaking-out.webp",
       "original": "1000014435.webp",
       "tone": "normal",
-      "aliases": ["tweaking", "im tweaking"],
+      "aliases": [
+        "tweaking",
+        "im tweaking"
+      ],
       "description": "distorted melting simpsons face in a bathroom mirror, tweaking out, freaking out, losing my mind, going insane, panicking, mental breakdown, overwhelmed, unhinged, losing it, spiralling, stressed beyond words, horrified"
     },
     {
       "file": "zee-new-art.jpg",
       "original": "1000014399.jpg",
       "tone": "normal",
-      "aliases": ["zee art", "new art"],
+      "aliases": [
+        "zee art",
+        "new art"
+      ],
       "description": "me when zee posts a new art, overflowing bin of tissues on the floor, reacting to someone posting new artwork, way too excited about an artist posting, obsessed with an artist, going feral over new art, fan reaction"
     },
     {
       "file": "fuck-ai.jpg",
       "original": "1000014397.jpg",
       "tone": "normal",
-      "aliases": ["fuck ai", "anti ai"],
+      "aliases": [
+        "fuck ai",
+        "anti ai"
+      ],
       "description": "fuck ai twice, no ai crossed out sign next to glados from portal, hating ai, anti ai, against generative ai, ai slop, ironic because glados is also an ai, machine learning hate, chatgpt hate, robots"
     },
     {
       "file": "gore-fans-when.jpg",
       "original": "1000014624.jpg",
       "tone": "dark",
-      "aliases": ["gore fans", "gore fetishists"],
+      "aliases": [
+        "gore fans",
+        "gore fetishists"
+      ],
       "description": "gore fetishists when you open their ribcages and pull out their organs, they suddenly do not like blood and pain anymore, crying screaming baby boss baby, people who say they love something until it happens to them, cannot take what they dish out, hypocrite, squeamish, be careful what you wish for"
     },
     {
       "file": "my-name-is-romeo.jpg",
       "original": "1000014235.jpg",
       "tone": "normal",
-      "aliases": ["romeo", "rose emoji"],
+      "aliases": [
+        "romeo",
+        "rose emoji"
+      ],
       "description": "yellow smiley emoji holding a red rose in its teeth, smug flirty grin, my name is romeo, flirting, rizz, being smooth, charming, romantic, seducing, pick up line, suave, wink"
     },
     {
       "file": "zuckerberg-good-boy.png",
       "original": "1000014063.png",
       "tone": "normal",
-      "aliases": ["zuckerberg", "good boy"],
+      "aliases": [
+        "zuckerberg",
+        "good boy"
+      ],
       "description": "mark zuckerberg looking up at the camera with his tongue out like an eager dog, good boy, obedient, waiting for praise, silly, goofy, lizard robot person, please pet me, doing what he is told"
     },
     {
       "file": "fuck-you-mean-no.png",
       "original": "1000013979.png",
       "tone": "normal",
-      "aliases": ["fuck you mean no", "what do you mean no"],
+      "aliases": [
+        "fuck you mean no",
+        "what do you mean no"
+      ],
       "description": "angry confused yellow emoji face, fuck you mean no, what do you mean no, refusing to accept a refusal, disbelief at being told no, offended by rejection, that was not an option, excuse me"
     },
     {
       "file": "isaacs-dancing.png",
       "original": "1000013921.png",
       "tone": "normal",
-      "aliases": ["isaac", "isaacs dancing"],
+      "aliases": [
+        "isaac",
+        "isaacs dancing"
+      ],
       "description": "binding of isaac sprite crying, the isaacs dancing, little pixel character, vibing, dancing, celebrating, sad but moving, roguelike game, tiny crying baby sprite"
+    },
+    {
+      "file": "cat-forgot-how-to-duck.png",
+      "tone": "normal",
+      "aliases": [
+        "forgot how to cat",
+        "knows how to duck"
+      ],
+      "description": "black and white cat floating low in water like a duck, this cat forgot how to cat but knows how to duck, pun on ducking and dodging, swimming cat, bad at being a cat, wordplay, dodge"
+    },
+    {
+      "file": "oh-look-a-penny.png",
+      "tone": "normal",
+      "aliases": [
+        "oh look a penny"
+      ],
+      "description": "white box truck with its roof and cab torn off after hitting a bridge, oh look a penny, getting distracted at the worst moment, one small distraction causes disaster, not paying attention while driving, crash, looking away"
+    },
+    {
+      "file": "hee-hee-man.png",
+      "tone": "normal",
+      "aliases": [
+        "hee hee man",
+        "hee heeman"
+      ],
+      "description": "he-man cartoon with michael jackson's face edited on, hee hee-man, awful pun, cursed edit, photoshop crime, masters of the universe, singer, shamone"
+    },
+    {
+      "file": "corona-vaccine.png",
+      "tone": "normal",
+      "aliases": [
+        "corona vaccine",
+        "corona shot"
+      ],
+      "description": "man in a face mask getting injected in the arm with a corona beer bottle, corona vaccine joke, covid pandemic humour, getting the shot, beer instead of medicine, drinking cures everything, lockdown era"
+    },
+    {
+      "file": "bro-is-nothing.png",
+      "tone": "normal",
+      "aliases": [
+        "bro is nothing"
+      ],
+      "description": "tiny newborn kitten sitting on a kitchen scale reading zero, bro is nothing, weightless, so small it does not register, worth nothing, insignificant, calling someone nothing, tiny baby cat"
+    },
+    {
+      "file": "fully-charged-cat.png",
+      "tone": "normal",
+      "aliases": [
+        "fully charged",
+        "charged cat"
+      ],
+      "description": "orange cat lying on the floor with sunlight stripes across its back that look like a full battery indicator, he's fully charged, battery at 100 percent, fully rested, energy full, recharged, ready to go, sunbathing cat"
+    },
+    {
+      "file": "fuck-off-spray.png",
+      "tone": "normal",
+      "aliases": [
+        "fuck off spray"
+      ],
+      "description": "black and white photo of an aerosol can labelled fuck off spray, keeps idiots and assholes away for up to 4 hours, wanting people to leave you alone, repelling annoying people, i need this, go away, antisocial"
+    },
+    {
+      "file": "bitch-be-gone.png",
+      "tone": "normal",
+      "aliases": [
+        "bitch be gone"
+      ],
+      "description": "purple air freshener can labelled bitch be gone, kills 99.9 percent of thots and bitches, don't try me spray, i need this so bad, wanting someone gone, getting rid of annoying people, cleaning product parody"
+    },
+    {
+      "file": "eminem-throwing-cat.png",
+      "tone": "normal",
+      "aliases": [
+        "eminem cat",
+        "throwing a cat"
+      ],
+      "description": "eminem in his classic pointing pose but throwing an orange cat, yeeting a cat, tossing something away, launching, throwing hands, chucking it, get rid of it, rapper meme template"
+    },
+    {
+      "file": "eminem-job-application.png",
+      "tone": "normal",
+      "aliases": [
+        "eminem job application",
+        "dropping applications"
+      ],
+      "description": "eminem in his classic pointing pose holding out a job application form, dropping job applications, applying for work everywhere, job hunting, handing in a cv resume, unemployed, looking for a job"
+    },
+    {
+      "file": "eminem-bomb.png",
+      "tone": "normal",
+      "aliases": [
+        "eminem bomb",
+        "dropping a bomb"
+      ],
+      "description": "eminem in his classic pointing pose holding a large aerial bomb, dropping a bomb, dropping bars, about to drop something huge, big announcement incoming, nuke, devastating news"
+    },
+    {
+      "file": "mcdonalds-make-out.png",
+      "tone": "normal",
+      "aliases": [
+        "make out",
+        "mcdonalds make out"
+      ],
+      "description": "mcdonalds takeout sign where the golden arches line up with the letters to read make out instead of take out, kissing, making out, accidental sign, funny coincidence, fast food, misread sign, wordplay"
+    },
+    {
+      "file": "wheelchair-minigun.png",
+      "tone": "dark",
+      "aliases": [
+        "wheelchair minigun",
+        "gun wheelchair"
+      ],
+      "description": "wheelchair modified with tank tracks and a mounted minigun, absurd over the top weapon, unstoppable, disabled but heavily armed, power upgrade, ready for war, cursed engineering, do not mess with grandma"
+    },
+    {
+      "file": "cat-on-gas-stove.png",
+      "tone": "dark",
+      "aliases": [
+        "cat on stove",
+        "cat on fire"
+      ],
+      "description": "black cat sitting calmly directly on a lit blue gas burner, unbothered by fire, completely fine in a disaster, this is fine energy, sitting in flames, demon cat, nothing can hurt me, burning but calm"
     }
   ]
 }
