@@ -19,6 +19,23 @@ const { count, problems } = await library.load();
 
 console.log(`\n${count} memes loaded`, library.countByTone());
 
+const byType = {};
+let total = 0;
+for (const m of library.memes.values()) {
+  const ext = path.extname(m.file).slice(1).toLowerCase();
+  byType[ext] = (byType[ext] ?? 0) + 1;
+  total += m.bytes ?? 0;
+}
+console.log('formats:', byType, `| ${(total / 1024 / 1024).toFixed(1)}MB total`);
+
+const heavy = [...library.memes.values()]
+  .filter((m) => m.bytes > 4 * 1024 * 1024)
+  .sort((a, b) => b.bytes - a.bytes);
+if (heavy.length) {
+  console.log('\nlargest files:');
+  for (const m of heavy) console.log(`    ${(m.bytes / 1024 / 1024).toFixed(1)}MB  ${m.file}`);
+}
+
 /* Every entry must have its file, and every file must have an entry. A meme
    missing from disk fails only when someone picks it, which is the worst
    possible time to find out. */

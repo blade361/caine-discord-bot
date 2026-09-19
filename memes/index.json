@@ -223,6 +223,27 @@
         "cat on fire"
       ],
       "description": "black cat sitting calmly directly on a lit blue gas burner, unbothered by fire, completely fine in a disaster, this is fine energy, sitting in flames, demon cat, nothing can hurt me, burning but calm"
+    },
+    {
+      "file": "happy-birthday-song.mp4",
+      "tone": "normal",
+      "aliases": [
+        "happy birthday",
+        "birthday song",
+        "feliz cumpleanos"
+      ],
+      "description": "guy in a car with a red backwards cap singing happy birthday to the camera, birthday wishes, happy birthday to you, wishing someone a happy birthday, celebrating a birthday, cumpleanos, many happy returns, birthday greeting, serenade, singing for someone's birthday"
+    },
+    {
+      "file": "your-guess.mp4",
+      "tone": "normal",
+      "aliases": [
+        "your guess",
+        "your guess is as good as mine",
+        "moistcritikal",
+        "penguinz0"
+      ],
+      "description": "moistcritikal penguinz0 charlie saying your guess is as good as mine, having no idea, no clue what is going on, nobody knows, beats me, who knows, shrugging at a question, equally confused, i have no explanation, deadpan confusion"
     }
   ]
 }

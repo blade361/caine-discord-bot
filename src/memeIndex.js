@@ -6,7 +6,7 @@
  * no API call.
  */
 
-import { readFile } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { FlyHash } from '../lib/flyhash/flyhash.js';
 import { FlyIndex } from '../lib/flyhash/index.js';
@@ -52,6 +52,14 @@ export class MemeLibrary {
     this.aliasMap = new Map(); // normalised alias -> file
   }
 
+  /* Discord refuses uploads over 10 MB on a server with no boosts. Any
+   * format works — mp4 and webm get a player, gif and webp animate, images
+   * embed — so the only real constraint is size, and it fails at the moment
+   * someone picks the meme rather than at startup. Checking here turns a
+   * confusing runtime error into a warning you see once. */
+  static UPLOAD_LIMIT = 10 * 1024 * 1024;
+  static SAFE_LIMIT = 9 * 1024 * 1024;
+
   async load() {
     const raw = await readFile(path.join(this.root, 'index.json'), 'utf8');
     const data = JSON.parse(raw);
@@ -69,6 +77,18 @@ export class MemeLibrary {
       }
 
       const record = { ...meme, tone: meme.tone ?? 'normal' };
+
+      try {
+        const { size } = await stat(path.join(this.root, 'images', meme.file));
+        record.bytes = size;
+        if (size > MemeLibrary.SAFE_LIMIT) {
+          const mb = (size / 1024 / 1024).toFixed(1);
+          problems.push(`${meme.file}: ${mb}MB — too big for Discord, it will fail when picked`);
+        }
+      } catch {
+        problems.push(`${meme.file}: listed in index.json but not in images/`);
+      }
+
       this.memes.set(meme.file, record);
       this.index.add(meme.file, memeText(record), record);
 
