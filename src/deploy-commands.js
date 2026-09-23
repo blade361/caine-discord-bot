@@ -1,5 +1,6 @@
 /**
- * deploy-commands.js — registers the /meme slash command.
+ * deploy-commands.js — registers the slash commands (see commands.js).
+ * The bot also does this itself on startup, so this is only a manual fallback.
  *
  * Run once, and again whenever the command's shape changes. Registering to a
  * single guild (rather than globally) makes it appear instantly instead of
@@ -7,23 +8,8 @@
  */
 
 import 'dotenv/config';
-import { REST, Routes, SlashCommandBuilder } from 'discord.js';
-
-const command = new SlashCommandBuilder()
-  .setName('meme')
-  .setDescription('Find a meme by describing it')
-  .addStringOption((opt) =>
-    opt.setName('description')
-      .setDescription('What is the meme about? Use the words that are in it.')
-      .setRequired(true))
-  .addStringOption((opt) =>
-    opt.setName('tone')
-      .setDescription('Filter by tone (default: either)')
-      .addChoices(
-        { name: 'normal', value: 'normal' },
-        { name: 'dark', value: 'dark' },
-        { name: 'either', value: 'either' },
-      ));
+import { REST, Routes } from 'discord.js';
+import { commands } from './commands.js';
 
 const { DISCORD_TOKEN, CLIENT_ID, GUILD_ID } = process.env;
 
@@ -47,9 +33,9 @@ for (const guild of guilds) {
   try {
     await rest.put(
       Routes.applicationGuildCommands(CLIENT_ID, guild),
-      { body: [command.toJSON()] },
+      { body: commands },
     );
-    console.log(`[deploy] /meme registered in ${guild}`);
+    console.log(`[deploy] commands registered in ${guild}`);
   } catch (err) {
     // One bad id should not stop the rest: you want to see exactly which
     // server failed, not just the first error.
