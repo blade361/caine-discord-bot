@@ -233,14 +233,22 @@ async function handleFrames(interaction) {
     .map((d) => d.name)
     .sort();
 
+  // `from` resumes an interrupted run: it skips the first video's earlier
+  // frames (1-based, by position in name order); later videos are whole.
+  const from = interaction.options.getInteger('from') ?? 1;
+
   const batches = [];
-  for (const video of videos) {
+  for (const [n, video] of videos.entries()) {
     const frames = (await readdir(path.join(FRAMES_ROOT, video)))
       .filter((f) => /\.(jpe?g|png|gif|webp)$/i.test(f))
       .sort();
-    for (let i = 0; i < frames.length; i += FRAMES_PER_MESSAGE) {
+    const start = n === 0 ? from - 1 : 0;
+    for (let i = start; i < frames.length; i += FRAMES_PER_MESSAGE) {
       const chunk = frames.slice(i, i + FRAMES_PER_MESSAGE);
-      batches.push({ video, first: i === 0, total: frames.length, files: chunk.map((f) => path.join(FRAMES_ROOT, video, f)) });
+      const header = i === 0
+        ? `**${video}** — ${frames.length} frames`
+        : i === start ? `**${video}** — from frame ${start + 1} of ${frames.length}` : undefined;
+      batches.push({ video, header, files: chunk.map((f) => path.join(FRAMES_ROOT, video, f)) });
     }
   }
 
@@ -267,7 +275,7 @@ async function handleFrames(interaction) {
     for (const batch of batches) {
       if (run.stopped) break;
       const msg = {
-        content: batch.first ? `**${batch.video}** — ${batch.total} frames` : undefined,
+        content: batch.header,
         files: batch.files.map((f) => new AttachmentBuilder(f, { name: path.basename(f) })),
       };
       if (!viaWebhook) {

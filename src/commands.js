@@ -35,6 +35,10 @@ const fotogramas = new SlashCommandBuilder()
         { name: 'video1', value: 'video1' },
         { name: 'video2', value: 'video2' },
       ))
+  .addIntegerOption((opt) =>
+    opt.setName('from')
+      .setDescription('Resume: start at this frame number of the first video')
+      .setMinValue(1))
   .addBooleanOption((opt) =>
     opt.setName('stop')
       .setDescription('Stop a run that is in progress'));
