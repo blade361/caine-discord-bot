@@ -227,8 +227,6 @@ async function handleFrames(interaction) {
     return;
   }
 
-  if (!interaction.channel) throw new Error('channel not available');
-
   const choice = interaction.options.getString('video') ?? 'all';
   const videos = (await readdir(FRAMES_ROOT, { withFileTypes: true }))
     .filter((d) => d.isDirectory() && (choice === 'all' || d.name === choice))
@@ -257,21 +255,41 @@ async function handleFrames(interaction) {
     content: `Posting ${batches.length} messages of frames. \`/fotogramas stop:true\` to stop.`,
     flags: MessageFlags.Ephemeral,
   });
-  console.log(`[memebot] fotogramas: ${batches.length} messages to #${interaction.channel.name ?? channelId}`);
+  console.log(`[memebot] fotogramas: ${batches.length} messages to #${interaction.channel?.name ?? channelId}`);
 
+  // Same two routes as the meme picker: channel.send needs View Channel,
+  // Send Messages and Attach Files there; the interaction webhook does not,
+  // but only lives 15 minutes. Start direct, switch for good on refusal.
+  let viaWebhook = !interaction.channel;
   let sent = 0;
+  let failure = null;
   try {
     for (const batch of batches) {
       if (run.stopped) break;
-      await interaction.channel.send({
+      const msg = {
         content: batch.first ? `**${batch.video}** — ${batch.total} frames` : undefined,
         files: batch.files.map((f) => new AttachmentBuilder(f, { name: path.basename(f) })),
-      });
+      };
+      if (!viaWebhook) {
+        try {
+          await interaction.channel.send(msg);
+          sent++;
+          continue;
+        } catch (err) {
+          console.warn(`[memebot] fotogramas direct send failed (${err.code ?? err.message}), using webhook`);
+          viaWebhook = true;
+        }
+      }
+      await interaction.followUp(msg);
       sent++;
     }
+  } catch (err) {
+    failure = err;
+    console.error('[memebot] fotogramas failed:', err);
   } finally {
     frameRuns.delete(channelId);
-    const summary = `${run.stopped ? 'Stopped' : 'Done'}: ${sent}/${batches.length} messages posted.`;
+    const state = failure ? `Failed (\`${failure.code ?? failure.message}\`)` : run.stopped ? 'Stopped' : 'Done';
+    const summary = `${state}: ${sent}/${batches.length} messages posted.`;
     console.log(`[memebot] fotogramas ${summary}`);
     // The interaction token lasts 15 minutes; a long run outlives it.
     await interaction.editReply({ content: summary }).catch(() => {});
