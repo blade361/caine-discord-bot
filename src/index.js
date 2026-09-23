@@ -11,7 +11,6 @@
 import 'dotenv/config';
 import path from 'node:path';
 import { existsSync } from 'node:fs';
-import { readdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import {
   Client,
@@ -27,7 +26,6 @@ import { commands } from './commands.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const MEMES_ROOT = path.join(__dirname, '..', 'memes');
-const FRAMES_ROOT = path.join(__dirname, '..', 'fotogramas');
 
 const library = new MemeLibrary({
   root: MEMES_ROOT,
@@ -76,8 +74,6 @@ client.on('interactionCreate', async (interaction) => {
   try {
     if (interaction.isChatInputCommand() && interaction.commandName === 'meme') {
       await handleSearch(interaction);
-    } else if (interaction.isChatInputCommand() && interaction.commandName === 'fotogramas') {
-      await handleFrames(interaction);
     } else if (interaction.isButton()) {
       await handleButton(interaction);
     }
@@ -197,111 +193,6 @@ async function handleButton(interaction) {
 
   pending.delete(sourceId);
   await interaction.update({ content: 'Posted.', components: [] });
-}
-
-/* /fotogramas — posts every frame under fotogramas/<video>/, in name order,
- * 10 per message (Discord's attachment limit). One run per channel at a
- * time; `stop:true` ends it after the message in flight. discord.js queues
- * around the rate limit on its own, so the loop just awaits each send. */
-const FRAMES_PER_MESSAGE = 10;
-const frameRuns = new Map(); // channel id -> { stopped }
-
-async function handleFrames(interaction) {
-  const channelId = interaction.channelId;
-
-  if (interaction.options.getBoolean('stop')) {
-    const run = frameRuns.get(channelId);
-    if (run) run.stopped = true;
-    await interaction.reply({
-      content: run ? 'Stopping after the current message.' : 'Nothing is running in this channel.',
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
-
-  if (frameRuns.has(channelId)) {
-    await interaction.reply({
-      content: 'Already posting frames here. Use `/fotogramas stop:true` to stop it.',
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
-
-  const choice = interaction.options.getString('video') ?? 'all';
-  const videos = (await readdir(FRAMES_ROOT, { withFileTypes: true }))
-    .filter((d) => d.isDirectory() && (choice === 'all' || d.name === choice))
-    .map((d) => d.name)
-    .sort();
-
-  // `from` resumes an interrupted run: it skips the first video's earlier
-  // frames (1-based, by position in name order); later videos are whole.
-  const from = interaction.options.getInteger('from') ?? 1;
-
-  const batches = [];
-  for (const [n, video] of videos.entries()) {
-    const frames = (await readdir(path.join(FRAMES_ROOT, video)))
-      .filter((f) => /\.(jpe?g|png|gif|webp)$/i.test(f))
-      .sort();
-    const start = n === 0 ? from - 1 : 0;
-    for (let i = start; i < frames.length; i += FRAMES_PER_MESSAGE) {
-      const chunk = frames.slice(i, i + FRAMES_PER_MESSAGE);
-      const header = i === 0
-        ? `**${video}** — ${frames.length} frames`
-        : i === start ? `**${video}** — from frame ${start + 1} of ${frames.length}` : undefined;
-      batches.push({ video, header, files: chunk.map((f) => path.join(FRAMES_ROOT, video, f)) });
-    }
-  }
-
-  if (batches.length === 0) {
-    await interaction.reply({ content: `No frames found for **${choice}**.`, flags: MessageFlags.Ephemeral });
-    return;
-  }
-
-  const run = { stopped: false };
-  frameRuns.set(channelId, run);
-  await interaction.reply({
-    content: `Posting ${batches.length} messages of frames. \`/fotogramas stop:true\` to stop.`,
-    flags: MessageFlags.Ephemeral,
-  });
-  console.log(`[memebot] fotogramas: ${batches.length} messages to #${interaction.channel?.name ?? channelId}`);
-
-  // Same two routes as the meme picker: channel.send needs View Channel,
-  // Send Messages and Attach Files there; the interaction webhook does not,
-  // but only lives 15 minutes. Start direct, switch for good on refusal.
-  let viaWebhook = !interaction.channel;
-  let sent = 0;
-  let failure = null;
-  try {
-    for (const batch of batches) {
-      if (run.stopped) break;
-      const msg = {
-        content: batch.header,
-        files: batch.files.map((f) => new AttachmentBuilder(f, { name: path.basename(f) })),
-      };
-      if (!viaWebhook) {
-        try {
-          await interaction.channel.send(msg);
-          sent++;
-          continue;
-        } catch (err) {
-          console.warn(`[memebot] fotogramas direct send failed (${err.code ?? err.message}), using webhook`);
-          viaWebhook = true;
-        }
-      }
-      await interaction.followUp(msg);
-      sent++;
-    }
-  } catch (err) {
-    failure = err;
-    console.error('[memebot] fotogramas failed:', err);
-  } finally {
-    frameRuns.delete(channelId);
-    const state = failure ? `Failed (\`${failure.code ?? failure.message}\`)` : run.stopped ? 'Stopped' : 'Done';
-    const summary = `${state}: ${sent}/${batches.length} messages posted.`;
-    console.log(`[memebot] fotogramas ${summary}`);
-    // The interaction token lasts 15 minutes; a long run outlives it.
-    await interaction.editReply({ content: summary }).catch(() => {});
-  }
 }
 
 /* Health endpoint.
