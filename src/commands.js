@@ -3,7 +3,7 @@
  * by the bot itself, which re-registers them on startup.
  */
 
-import { SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 
 const meme = new SlashCommandBuilder()
   .setName('meme')
@@ -21,4 +21,18 @@ const meme = new SlashCommandBuilder()
         { name: 'either', value: 'either' },
       ));
 
-export const commands = [meme].map((c) => c.toJSON());
+// Posts thousands of images, so it is hidden from members who cannot manage
+// messages. Server admins can change that under Integrations.
+const fotogramas = new SlashCommandBuilder()
+  .setName('fotogramas')
+  .setDescription('Post every frame of video2, 10 per message')
+  .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
+  .addIntegerOption((opt) =>
+    opt.setName('from')
+      .setDescription('Resume: start at this frame number')
+      .setMinValue(1))
+  .addBooleanOption((opt) =>
+    opt.setName('stop')
+      .setDescription('Stop a run that is in progress'));
+
+export const commands = [meme, fotogramas].map((c) => c.toJSON());
