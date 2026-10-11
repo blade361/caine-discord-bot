@@ -24,6 +24,7 @@ import {
 } from 'discord.js';
 import { MemeLibrary } from './memeIndex.js';
 import { commands } from './commands.js';
+import { startPanel } from './panel.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const MEMES_ROOT = path.join(__dirname, '..', 'memes');
@@ -304,25 +305,21 @@ async function handleFrames(interaction) {
   }
 }
 
-/* Health endpoint.
+/* Web panel and health endpoint (see panel.js).
  *
  * Only starts if PORT is set, which Render does for a Web Service and does
  * not for a Background Worker. So the same code runs unchanged on both:
- * as a Worker it is a pure bot, as a Web Service it also answers pings and
- * therefore stays awake on the free tier. */
+ * as a Worker it is a pure bot, as a Web Service it also serves the panel,
+ * answers pings and therefore stays awake on the free tier. */
 if (process.env.PORT) {
-  const { createServer } = await import('node:http');
-  createServer((req, res) => {
-    const ready = client.isReady();
-    res.writeHead(ready ? 200 : 503, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({
-      ok: ready,
-      memes: library.size,
-      uptime: Math.round(process.uptime()),
-    }));
-  }).listen(process.env.PORT, () => {
-    console.log(`[memebot] health endpoint on :${process.env.PORT}`);
-    startKeepAlive();
+  startPanel({
+    client,
+    library,
+    port: process.env.PORT,
+    onListening: () => {
+      console.log(`[memebot] web panel on :${process.env.PORT}`);
+      startKeepAlive();
+    },
   });
 }
 
@@ -348,8 +345,8 @@ if (process.env.PORT) {
 const KEEPALIVE_MINUTES = Number(process.env.KEEPALIVE_MINUTES) || 10;
 
 function startKeepAlive() {
-  const url = process.env.RENDER_EXTERNAL_URL;
-  if (!url) return;
+  if (!process.env.RENDER_EXTERNAL_URL) return;
+  const url = new URL('/health', process.env.RENDER_EXTERNAL_URL).href;
 
   console.log(`[memebot] keep-alive pinging ${url} every ${KEEPALIVE_MINUTES} min`);
 
