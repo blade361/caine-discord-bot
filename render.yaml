@@ -49,3 +49,6 @@ services:
       # Render's 15-minute idle timeout.
       - key: KEEPALIVE_MINUTES
         value: "10"
+      # Password for the web panel at the service URL. Unset = panel off.
+      - key: PANEL_PASSWORD
+        sync: false

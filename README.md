@@ -176,6 +176,14 @@ to stay under it.
 Either way, set `DISCORD_TOKEN`, `CLIENT_ID` and `GUILD_ID` under Environment
 in the Render dashboard.
 
+### Web panel
+
+On a Web Service the service URL opens a small menu: pick a server and a
+channel the bot can post in, type a message, and Caine sends it. Set
+`PANEL_PASSWORD` in Render's Environment tab; the browser asks for it (any
+username). Without it the panel is off, since the page speaks as the bot.
+The health JSON lives at `/health`, which is what the keep-alive pings.
+
 ### Always returning something
 
 `/meme` never answers "not found". If nothing clears `MIN_SCORE` it says so
