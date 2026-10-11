@@ -12,6 +12,11 @@
  *   GET  /api/channels  servers and their text channels
  *   POST /api/send      { channelId, content }
  *   GET  /health        readiness JSON, no auth (keep-alive pings this)
+ *
+ * Hardening: repeated wrong passwords from one IP are locked out for a
+ * while, the page refuses to be framed, and /api/send only accepts JSON
+ * from this same origin, so another site cannot post through the browser's
+ * cached Basic credentials.
  */
 
 import { createServer } from 'node:http';
@@ -19,6 +24,10 @@ import { timingSafeEqual } from 'node:crypto';
 import { ChannelType, PermissionFlagsBits } from 'discord.js';
 
 const SENDABLE = [ChannelType.GuildText, ChannelType.GuildAnnouncement];
+
+const MAX_FAILURES = 10;
+const LOCKOUT_MS = 15 * 60 * 1000;
+const failures = new Map(); // ip -> { count, until }
 
 export function startPanel({ client, library, port, onListening }) {
   const password = process.env.PANEL_PASSWORD ?? '';
@@ -29,10 +38,16 @@ export function startPanel({ client, library, port, onListening }) {
     try {
       if (url.pathname === '/health') return health(res, client, library);
       if (!password) return send(res, 404, 'text/plain', 'Panel disabled: set PANEL_PASSWORD.');
+
+      const ip = clientIp(req);
+      const record = failures.get(ip);
+      if (record && record.until > Date.now()) return send(res, 429, 'text/plain', 'Too many wrong passwords. Try again later.');
       if (!authorized(req, password)) {
+        if (req.headers.authorization) noteFailure(ip);
         res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Caine", charset="UTF-8"' });
         return res.end('Password required.');
       }
+      failures.delete(ip);
 
       if (req.method === 'GET' && url.pathname === '/') return send(res, 200, 'text/html; charset=utf-8', PAGE);
       if (req.method === 'GET' && url.pathname === '/api/channels') return json(res, 200, listChannels(client));
@@ -80,6 +95,14 @@ function listChannels(client) {
 }
 
 async function sendMessage(req, res, client) {
+  // A cross-site form or text/plain fetch cannot set a JSON content type
+  // without a CORS preflight, which this server never approves.
+  if (!(req.headers['content-type'] ?? '').startsWith('application/json')) {
+    return json(res, 415, { error: 'Expected application/json.' });
+  }
+  const origin = req.headers.origin;
+  if (origin && new URL(origin).host !== req.headers.host) return json(res, 403, { error: 'Cross-origin request refused.' });
+
   const body = await readJson(req);
   const content = String(body.content ?? '').trim();
   if (!content) return json(res, 400, { error: 'Message is empty.' });
@@ -102,12 +125,33 @@ async function readJson(req) {
   try { return JSON.parse(raw || '{}'); } catch { throw new Error('Invalid JSON.'); }
 }
 
+/* Render puts the real client first in X-Forwarded-For. */
+function clientIp(req) {
+  return (req.headers['x-forwarded-for'] ?? '').split(',')[0].trim() || req.socket.remoteAddress;
+}
+
+function noteFailure(ip) {
+  const record = failures.get(ip) ?? { count: 0, until: 0 };
+  record.count++;
+  if (record.count >= MAX_FAILURES) {
+    record.count = 0;
+    record.until = Date.now() + LOCKOUT_MS;
+    console.warn(`[memebot] panel: ${ip} locked out after ${MAX_FAILURES} wrong passwords`);
+  }
+  failures.set(ip, record);
+}
+
 function json(res, status, data) {
   send(res, status, 'application/json', JSON.stringify(data));
 }
 
 function send(res, status, type, body) {
-  res.writeHead(status, { 'Content-Type': type, 'Cache-Control': 'no-store' });
+  res.writeHead(status, {
+    'Content-Type': type,
+    'Cache-Control': 'no-store',
+    'X-Frame-Options': 'DENY',
+    'Content-Security-Policy': "frame-ancestors 'none'",
+  });
   res.end(body);
 }
 
