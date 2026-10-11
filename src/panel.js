@@ -25,9 +25,16 @@ import { ChannelType, PermissionFlagsBits } from 'discord.js';
 
 const SENDABLE = [ChannelType.GuildText, ChannelType.GuildAnnouncement];
 
+/* Wrong-password limits, per 15-minute window: 10 per IP, 100 in total.
+   The total is what actually stops a brute force, since IPs are cheap to
+   rotate; it also bounds the map, which is cleared every window. Hitting it
+   locks the panel for everyone until the window ends. */
 const MAX_FAILURES = 10;
-const LOCKOUT_MS = 15 * 60 * 1000;
-const failures = new Map(); // ip -> { count, until }
+const MAX_TOTAL_FAILURES = 100;
+const WINDOW_MS = 15 * 60 * 1000;
+let windowStart = Date.now();
+let totalFailures = 0;
+const failures = new Map(); // ip -> count in the current window
 
 export function startPanel({ client, library, port, onListening }) {
   const password = process.env.PANEL_PASSWORD ?? '';
@@ -40,14 +47,12 @@ export function startPanel({ client, library, port, onListening }) {
       if (!password) return send(res, 404, 'text/plain', 'Panel disabled: set PANEL_PASSWORD.');
 
       const ip = clientIp(req);
-      const record = failures.get(ip);
-      if (record && record.until > Date.now()) return send(res, 429, 'text/plain', 'Too many wrong passwords. Try again later.');
+      if (lockedOut(ip)) return send(res, 429, 'text/plain', 'Too many wrong passwords. Try again later.');
       if (!authorized(req, password)) {
         if (req.headers.authorization) noteFailure(ip);
         res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Caine", charset="UTF-8"' });
         return res.end('Password required.');
       }
-      failures.delete(ip);
 
       if (req.method === 'GET' && url.pathname === '/') return send(res, 200, 'text/html; charset=utf-8', PAGE);
       if (req.method === 'GET' && url.pathname === '/api/channels') return json(res, 200, listChannels(client));
@@ -125,20 +130,30 @@ async function readJson(req) {
   try { return JSON.parse(raw || '{}'); } catch { throw new Error('Invalid JSON.'); }
 }
 
-/* Render puts the real client first in X-Forwarded-For. */
+/* Render sits behind Cloudflare, which overwrites CF-Connecting-IP with the
+   real client address. X-Forwarded-For is client-supplied at the front, so
+   only its last hop is trusted, and only as a fallback. */
 function clientIp(req) {
-  return (req.headers['x-forwarded-for'] ?? '').split(',')[0].trim() || req.socket.remoteAddress;
+  return req.headers['cf-connecting-ip']
+    || (req.headers['x-forwarded-for'] ?? '').split(',').pop().trim()
+    || req.socket.remoteAddress;
+}
+
+function lockedOut(ip) {
+  if (Date.now() - windowStart > WINDOW_MS) {
+    windowStart = Date.now();
+    totalFailures = 0;
+    failures.clear();
+  }
+  return totalFailures >= MAX_TOTAL_FAILURES || (failures.get(ip) ?? 0) >= MAX_FAILURES;
 }
 
 function noteFailure(ip) {
-  const record = failures.get(ip) ?? { count: 0, until: 0 };
-  record.count++;
-  if (record.count >= MAX_FAILURES) {
-    record.count = 0;
-    record.until = Date.now() + LOCKOUT_MS;
-    console.warn(`[memebot] panel: ${ip} locked out after ${MAX_FAILURES} wrong passwords`);
-  }
-  failures.set(ip, record);
+  totalFailures++;
+  const count = (failures.get(ip) ?? 0) + 1;
+  failures.set(ip, count);
+  if (count === MAX_FAILURES) console.warn(`[memebot] panel: ${ip} locked out after ${MAX_FAILURES} wrong passwords`);
+  if (totalFailures === MAX_TOTAL_FAILURES) console.warn('[memebot] panel: locked for everyone, too many wrong passwords');
 }
 
 function json(res, status, data) {
