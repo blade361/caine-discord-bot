@@ -35,4 +35,20 @@ const fotogramas = new SlashCommandBuilder()
     opt.setName('stop')
       .setDescription('Stop a run that is in progress'));
 
-export const commands = [meme, fotogramas].map((c) => c.toJSON());
+// Opens a room in one of the games: the private admin link goes only to whoever
+// ran it, the join link is posted for everyone.
+const game = new SlashCommandBuilder()
+  .setName('game')
+  .setDescription('Open a game room: you get the admin link, everyone gets the join link')
+  .addStringOption((opt) =>
+    opt.setName('game')
+      .setDescription('Which game')
+      .setRequired(true)
+      .addChoices(
+        { name: "Hazbin Hold'em (poker)", value: 'poker' },
+        { name: 'Hazbin 8-Ball (pool tournament)', value: 'pool' },
+        { name: "Lucifer's Gallows (hangman)", value: 'hangman' },
+        { name: "Alastor's Duck Hunt", value: 'duckhunt' },
+      ));
+
+export const commands = [meme, fotogramas, game].map((c) => c.toJSON());
