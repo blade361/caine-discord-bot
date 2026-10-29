@@ -6,6 +6,9 @@
  * Shows the best few matches privately, you pick one, the bot posts it to the
  * channel. Private picker means a bad match is never visible to anyone else,
  * which is what lets the threshold stay generous.
+ *
+ * /game game:<poker|pool|hangman|duckhunt> opens a room in one of the games
+ * (see games.js): admin link privately to whoever ran it, join link for all.
  */
 
 import 'dotenv/config';
@@ -25,6 +28,7 @@ import {
 import { MemeLibrary } from './memeIndex.js';
 import { commands } from './commands.js';
 import { startPanel } from './panel.js';
+import { GAMES, createRoom } from './games.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const MEMES_ROOT = path.join(__dirname, '..', 'memes');
@@ -79,6 +83,8 @@ client.on('interactionCreate', async (interaction) => {
       await handleSearch(interaction);
     } else if (interaction.isChatInputCommand() && interaction.commandName === 'fotogramas') {
       await handleFrames(interaction);
+    } else if (interaction.isChatInputCommand() && interaction.commandName === 'game') {
+      await handleGame(interaction);
     } else if (interaction.isButton()) {
       await handleButton(interaction);
     }
@@ -96,6 +102,36 @@ client.on('interactionCreate', async (interaction) => {
     else await interaction.reply(msg).catch(() => {});
   }
 });
+
+/* /game game:<poker|pool|hangman|duckhunt>
+   The admin link is a private reply to whoever ran the command; the join link
+   is a public follow-up. Deferred first: a sleeping game server can take up to
+   a minute to wake, and Discord only waits 3 seconds for a reply. */
+async function handleGame(interaction) {
+  const game = GAMES[interaction.options.getString('game', true)];
+  const joinButton = (url) => new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setLabel(`Play ${game.name}`).setStyle(ButtonStyle.Link).setURL(url)
+  );
+
+  if (!game.rooms) {
+    await interaction.reply({
+      content: `🎮 ${interaction.user} wants everyone to play **${game.name}**!\n${game.url}`,
+      components: [joinButton(game.url)],
+    });
+    return;
+  }
+
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+  const { adminUrl, joinUrl } = await createRoom(game);
+
+  await interaction.editReply({
+    content: `🔑 Your **${game.name}** room is open. This is your admin link — only you can see it, don't share it:\n${adminUrl}`,
+  });
+  await interaction.followUp({
+    content: `🎮 ${interaction.user} opened a **${game.name}** room — join here:\n${joinUrl}`,
+    components: [joinButton(joinUrl)],
+  });
+}
 
 async function handleSearch(interaction) {
   const query = interaction.options.getString('description', true);

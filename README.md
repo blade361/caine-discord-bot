@@ -13,6 +13,18 @@ to host. Each meme is 256 bytes of tag, matching takes microseconds.
 It shows the best few matches privately. You pick one, the bot posts it to the
 channel. A bad match is never visible to anyone but you.
 
+## Game rooms
+
+```
+/game game:poker      # also pool, hangman, duckhunt
+```
+
+Opens a room in one of the Hazbin games (Render workspace "games", URLs in
+`src/games.js`, overridable with `GAME_URL_POKER` / `_POOL` / `_HANGMAN` /
+`_DUCKHUNT`). Whoever runs it gets the private admin link (only they see it);
+the join link is posted to the channel for everyone. Duck Hunt is single
+player, so it only posts its link.
+
 ## Setup
 
 **1. Create the Discord application**
