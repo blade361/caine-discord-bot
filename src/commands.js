@@ -51,4 +51,8 @@ const game = new SlashCommandBuilder()
         { name: "Alastor's Duck Hunt", value: 'duckhunt' },
       ));
 
-export const commands = [meme, fotogramas, game].map((c) => c.toJSON());
+const caine = new SlashCommandBuilder()
+  .setName('caine')
+  .setDescription('Post a random Caine image');
+
+export const commands = [meme, fotogramas, game, caine].map((c) => c.toJSON());
