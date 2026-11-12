@@ -33,6 +33,8 @@ import { GAMES, createRoom } from './games.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const MEMES_ROOT = path.join(__dirname, '..', 'memes');
 const FRAMES_ROOT = path.join(__dirname, '..', 'fotogramas');
+const CAINE_ROOT = path.join(__dirname, '..', 'caine');
+const IMAGE_RE = /\.(jpe?g|png|gif|webp)$/i;
 
 const library = new MemeLibrary({
   root: MEMES_ROOT,
@@ -83,6 +85,8 @@ client.on('interactionCreate', async (interaction) => {
       await handleSearch(interaction);
     } else if (interaction.isChatInputCommand() && interaction.commandName === 'fotogramas') {
       await handleFrames(interaction);
+    } else if (interaction.isChatInputCommand() && interaction.commandName === 'caine') {
+      await handleCaine(interaction);
     } else if (interaction.isChatInputCommand() && interaction.commandName === 'game') {
       await handleGame(interaction);
     } else if (interaction.isButton()) {
@@ -131,6 +135,31 @@ async function handleGame(interaction) {
     content: `🎮 ${interaction.user} opened a **${game.name}** room — join here:\n${joinUrl}`,
     components: [joinButton(joinUrl)],
   });
+}
+
+/* /caine — posts one random image from caine/. If that folder has no images
+   yet, falls back to a random frame from fotogramas/ so the command works. */
+async function handleCaine(interaction) {
+  const listImages = async (dir) => {
+    try {
+      return (await readdir(dir)).filter((f) => IMAGE_RE.test(f)).map((f) => path.join(dir, f));
+    } catch {
+      return [];
+    }
+  };
+
+  let files = await listImages(CAINE_ROOT);
+  if (files.length === 0) {
+    const dirs = await readdir(FRAMES_ROOT, { withFileTypes: true }).catch(() => []);
+    for (const d of dirs) if (d.isDirectory()) files.push(...await listImages(path.join(FRAMES_ROOT, d.name)));
+  }
+  if (files.length === 0) {
+    await interaction.reply({ content: 'I have no Caine images yet.', flags: MessageFlags.Ephemeral });
+    return;
+  }
+
+  const file = files[Math.floor(Math.random() * files.length)];
+  await interaction.reply({ files: [new AttachmentBuilder(file, { name: path.basename(file) })] });
 }
 
 async function handleSearch(interaction) {
